@@ -3,124 +3,211 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>TapTempo — BPM Calculator</title>
+<title>BPM Calculator</title>
+
 <style>
-  :root{--bg:#fbfdff;--card:#fff;--accent:#0b66ff;--muted:#556;--glass:rgba(11,102,255,0.06)}
+  :root{--bg:#f7fbff;--card:#fff;--accent:#0b66ff;--muted:#556;--glass:rgba(11,102,255,0.06)}
   *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial}
-  body{margin:0;background:linear-gradient(180deg,var(--bg),#f2f7ff);color:#07203a;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
-  .wrap{width:920px;max-width:100%;display:grid;grid-template-columns:1fr 340px;gap:20px}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,var(--bg),#eef6ff);
+    color:#07203a;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+  }
+  .wrap{width:900px;max-width:100%;display:grid;grid-template-columns:1fr 330px;gap:20px}
   .card{background:var(--card);padding:20px;border-radius:12px;box-shadow:0 6px 18px rgba(8,20,40,0.06)}
-  h1{margin:0 0 6px;font-size:20px}
-  .lead{color:var(--muted);font-size:13px;margin-bottom:14px}
-  .bpm-display{font-weight:700;font-size:64px;text-align:center;padding:20px;border-radius:10px;background:linear-gradient(90deg,var(--glass),transparent);margin-bottom:10px}
-  .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-  button{cursor:pointer;padding:10px 14px;border-radius:8px;border:1px solid rgba(7,32,58,0.06);background:#fff;font-weight:600}
-  .tap-btn{background:var(--accent);color:#fff;border:none;font-size:18px;padding:14px 20px}
+  h1{margin:0 0 6px;font-size:22px}
+  .lead{color:var(--muted);font-size:14px;margin-bottom:12px}
+  .bpm-display{
+    font-weight:700;font-size:64px;text-align:center;padding:20px;
+    border-radius:10px;background:linear-gradient(90deg,var(--glass),transparent);
+    margin-bottom:10px;
+  }
+  .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  button{
+    cursor:pointer;padding:12px 16px;border-radius:8px;border:1px solid rgba(7,32,58,0.10);
+    background:#fff;font-weight:600
+  }
+  .tap-btn{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    font-size:20px;
+    padding:14px 22px;
+  }
   .small{font-size:13px;color:var(--muted)}
-  .meta{font-size:13px;color:var(--muted);margin-top:8px;text-align:center}
-  .note{font-size:12px;color:#334;opacity:.8;margin-top:10px}
+  .meta{text-align:center;font-size:14px;color:var(--muted);margin-top:10px}
   footer{grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;margin-top:12px}
   @media (max-width:880px){.wrap{grid-template-columns:1fr;}}
 </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <!-- Left: main -->
-    <div class="card">
-      <h1>BPM (Beats Per Minute) Calculator</h1>
-      <div class="lead">Tap the button with the beat (or press <strong>Space</strong>) to estimate tempo.</div>
+<div class="wrap">
 
-      <div class="bpm-display" id="bpmDisplay">—</div>
+  <!-- LEFT SIDE -->
+  <div class="card">
+    <h1>BPM (Beats Per Minute) Calculator</h1>
+    <div class="lead">Tap the button or press <b>Spacebar</b> to get BPM.</div>
 
-      <div class="controls">
-        <button id="tapBtn" class="tap-btn" title="Tap spacebar">Tap</button>
-        <button id="resetBtn">Reset</button>
-        <button id="copyBtn">Copy BPM</button>
-      </div>
+    <div class="bpm-display" id="bpmDisplay">—</div>
 
-      <div class="meta" id="metaInfo">Taps: 0 · Smoothed BPM: — · Raw BPM: —</div>
-
-      <div style="margin-top:14px">
-        <div class="note">Tip: Tap steadily 4–8 times. The display uses smoothing to reduce jumps.</div>
-      </div>
+    <div class="controls">
+      <button id="tapBtn" class="tap-btn">Tap</button>
+      <button id="resetBtn">Reset</button>
+      <button id="copyBtn">Copy BPM</button>
     </div>
 
-    <!-- Right: explanation & tips -->
-    <div class="card right">
-      <h2 style="margin:0 0 8px">How it works</h2>
-      <p class="small">Each tap records a timestamp. The app computes the average time between recent taps (Δt), converts that into tempo using BPM = 60 / Δt, and applies smoothing so the value stabilizes quickly.</p>
+    <div class="meta" id="metaInfo">Taps: 0 · Smoothed BPM: — · Raw BPM: —</div>
 
-      <h3 style="margin-top:12px;margin-bottom:6px">Features</h3>
-      <ul class="small" style="padding-left:18px">
-        <li>Tap-based BPM with smoothing</li>
-        <li>Quick reset and copy</li>
-        <li>Keyboard support (Space key)</li>
-      </ul>
-
-      <h3 style="margin-top:12px;margin-bottom:6px">Usage tips</h3>
-      <ol class="small" style="padding-left:18px">
-        <li>Tap steadily (4–8 taps) for a stable reading.</li>
-        <li>Avoid accidental double-taps; if that happens press Reset and try again.</li>
-        <li>Use headphones or a metronome if matching a live performance.</li>
-      </ol>
-
-      <div style="margin-top:10px">
-        <strong>Deploy:</strong> Host on GitHub Pages or Netlify (static site).<br>
-        <span class="small">No backend required.</span>
-      </div>
-    </div>
-
-    <footer class="card" style="text-align:center">Built with basic timing logic • Suitable for GitHub Pages</footer>
+    <p class="small" style="margin-top:14px;">
+      Tip: Tap 4–8 times steadily for best results. A beep sound will play on every tap.
+    </p>
   </div>
 
-<script>
-/* ---------- Tap tempo logic (simplified; no timestamps shown) ---------- */
-const tapBtn = document.getElementById('tapBtn');
-const resetBtn = document.getElementById('resetBtn');
-const copyBtn = document.getElementById('copyBtn');
-const bpmDisplay = document.getElementById('bpmDisplay');
-const metaInfo = document.getElementById('metaInfo');
+  <!-- RIGHT SIDE -->
+  <div class="card">
+    <h2 style="margin:0 0 10px;">How it Works</h2>
+    <p class="small">
+      Each tap records a timestamp (t₁, t₂, t₃...).  
+      The system calculates the average time between taps (Δt).  
+      Tempo is calculated using <b>BPM = 60 / Δt</b>.
+    </p>
 
-let taps = [];           // timestamps in seconds
+    <h3>Features</h3>
+    <ul class="small">
+      <li>Tap-based BPM detection</li>
+      <li>Smoothing for stable BPM output</li>
+      <li>Beep sound on every tap</li>
+      <li>Keyboard support (Spacebar)</li>
+    </ul>
+
+    <h3>Sound System</h3>
+    <p class="small">
+      Place your sound file (e.g., <b>click.wav</b>) in the repository.  
+      The page automatically plays it on every tap.
+    </p>
+  </div>
+
+  <footer class="card">BPM Calculator • Simple Timing Logic + Sound</footer>
+
+</div>
+
+<script>
+/* ----------------------------------------------------------
+   LOAD YOUR SOUND FILE
+   ----------------------------------------------------------
+   Upload your file (example: click.wav) to the repo.
+   Then update the line below with your exact filename.
+---------------------------------------------------------- */
+
+let tapSound = new Audio("mixkit-censorship-beep-1082.wav");  // change this to your file name
+
+
+/* ----------------------------------------------------------
+   BPM CALCULATION VARIABLES
+---------------------------------------------------------- */
+let taps = [];
 let smoothedBPM = null;
 let lastRawBPM = null;
-const SMOOTH_ALPHA = 0.25; // exponential smoothing amount (0-1)
+const SMOOTH_ALPHA = 0.25;
 
-function updateUI() {
-  bpmDisplay.textContent = smoothedBPM ? Math.round(smoothedBPM) : '—';
-  metaInfo.textContent = `Taps: ${taps.length} · Smoothed BPM: ${smoothedBPM?Math.round(smoothedBPM):'—'} · Raw BPM: ${lastRawBPM?Math.round(lastRawBPM):'—'}`;
+const tapBtn = document.getElementById("tapBtn");
+const bpmDisplay = document.getElementById("bpmDisplay");
+const metaInfo = document.getElementById("metaInfo");
+const resetBtn = document.getElementById("resetBtn");
+const copyBtn = document.getElementById("copyBtn");
+
+
+/* ----------------------------------------------------------
+   PLAY TAP SOUND
+---------------------------------------------------------- */
+function playTapSound() {
+    tapSound.currentTime = 0;  // restart sound
+    tapSound.play();
 }
 
+
+/* ----------------------------------------------------------
+   CALCULATE BPM
+---------------------------------------------------------- */
 function addTap(ts) {
-  taps.push(ts);
-  // keep reasonable history
-  if(taps.length>100) taps = taps.slice(-100);
-  if(taps.length>=2) {
-    // compute average interval between first and last of recent window (last N taps)
-    const N = Math.min(6, taps.length);
-    const recent = taps.slice(-N);
-    const avgInterval = (recent[recent.length-1] - recent[0]) / (recent.length - 1);
-    const rawBPM = 60 / avgInterval;
-    lastRawBPM = rawBPM;
-    // exponential smoothing to stabilize
-    if(smoothedBPM == null) smoothedBPM = rawBPM;
-    else smoothedBPM = (SMOOTH_ALPHA * rawBPM) + ((1 - SMOOTH_ALPHA) * smoothedBPM);
-  }
-  updateUI();
+    taps.push(ts);
+
+    if (taps.length >= 2) {
+        const N = Math.min(6, taps.length);
+        const recent = taps.slice(-N);
+
+        const avgInterval =
+            (recent[recent.length - 1] - recent[0]) / (recent.length - 1);
+
+        const rawBPM = 60 / avgInterval;
+        lastRawBPM = rawBPM;
+
+        if (smoothedBPM == null) smoothedBPM = rawBPM;
+        else smoothedBPM =
+            SMOOTH_ALPHA * rawBPM + (1 - SMOOTH_ALPHA) * smoothedBPM;
+    }
+
+    updateUI();
 }
 
-tapBtn.addEventListener('click', () => addTap(performance.now()/1000));
-resetBtn.addEventListener('click', () => { taps=[]; smoothedBPM=null; lastRawBPM=null; updateUI(); });
 
-copyBtn.addEventListener('click', async () => {
-  if(!smoothedBPM) return alert('No BPM to copy');
-  try { await navigator.clipboard.writeText(Math.round(smoothedBPM).toString()); alert('BPM copied'); } catch(e){ alert('Copy failed'); }
+/* ----------------------------------------------------------
+   UPDATE UI
+---------------------------------------------------------- */
+function updateUI() {
+    bpmDisplay.textContent = smoothedBPM ? Math.round(smoothedBPM) : "—";
+    metaInfo.textContent =
+        `Taps: ${taps.length} · Smoothed BPM: ${
+            smoothedBPM ? Math.round(smoothedBPM) : "—"
+        } · Raw BPM: ${
+            lastRawBPM ? Math.round(lastRawBPM) : "—"
+        }`;
+}
+
+
+/* ----------------------------------------------------------
+   TAP EVENTS
+---------------------------------------------------------- */
+tapBtn.addEventListener("click", () => {
+    playTapSound();
+    addTap(performance.now() / 1000);
 });
 
-window.addEventListener('keydown', (e)=> { if(e.code === 'Space') { e.preventDefault(); addTap(performance.now()/1000); } });
+window.addEventListener("keydown", (e) => {
+    if (e.code === "Space") {
+        e.preventDefault();
+        playTapSound();
+        addTap(performance.now() / 1000);
+    }
+});
 
-/* init UI */
+
+/* ----------------------------------------------------------
+   RESET + COPY
+---------------------------------------------------------- */
+resetBtn.addEventListener("click", () => {
+    taps = [];
+    smoothedBPM = null;
+    lastRawBPM = null;
+    updateUI();
+});
+
+copyBtn.addEventListener("click", async () => {
+    if (!smoothedBPM) return alert("No BPM to copy");
+    await navigator.clipboard.writeText(Math.round(smoothedBPM));
+    alert("BPM copied!");
+});
+
+
+/* Initialize */
 updateUI();
 </script>
+
 </body>
 </html>
